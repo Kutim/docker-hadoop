@@ -2,6 +2,7 @@ version: "3"
 
 services:
   namenode:
+    build: ./namenode
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
     restart: always
@@ -16,7 +17,24 @@ services:
     env_file:
       - ./hadoop.env
 
+  backupnamenode:
+    build: ./backupnamenode
+    image: bde2020/hadoop-backupnamenode:2.0.0-hadoop3.2.1-java8
+    container_name: backupnamenode
+    restart: always
+    ports: 
+      - 50100:50100
+      - 50105:50105
+    volumes:
+      - hadoop_backupnamenode:/hadoop/dfs/name
+    environment:
+      CLUSTER_NAME: test
+      TZ: Asia/Shanghai
+    env_file:
+      - ./hadoop.env
+
   datanode:
+    build: ./datanode
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode
     restart: always
@@ -29,6 +47,7 @@ services:
       - ./hadoop.env
   
   resourcemanager:
+    build: ./resourcemanager
     image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
     container_name: resourcemanager
     restart: always
@@ -39,6 +58,7 @@ services:
       - ./hadoop.env
 
   nodemanager1:
+    build: ./nodemanager
     image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     container_name: nodemanager
     restart: always
@@ -49,6 +69,7 @@ services:
       - ./hadoop.env
   
   historyserver:
+    build: ./historyserver
     image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
     container_name: historyserver
     restart: always
@@ -62,5 +83,6 @@ services:
   
 volumes:
   hadoop_namenode:
+  hadoop_backupnamenode:
   hadoop_datanode:
   hadoop_historyserver:
