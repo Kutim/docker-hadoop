@@ -11,7 +11,8 @@ services:
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
     environment:
-      - CLUSTER_NAME=test
+      CLUSTER_NAME: test
+      TZ: Asia/Shanghai
     env_file:
       - ./hadoop.env
 
@@ -23,6 +24,7 @@ services:
       - hadoop_datanode:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
+      TZ: Asia/Shanghai
     env_file:
       - ./hadoop.env
   
@@ -32,6 +34,7 @@ services:
     restart: always
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
+      TZ: Asia/Shanghai
     env_file:
       - ./hadoop.env
 
@@ -41,6 +44,7 @@ services:
     restart: always
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+      TZ: Asia/Shanghai
     env_file:
       - ./hadoop.env
   
@@ -50,6 +54,7 @@ services:
     restart: always
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+      TZ: Asia/Shanghai
     volumes:
       - hadoop_historyserver:/hadoop/yarn/timeline
     env_file:
