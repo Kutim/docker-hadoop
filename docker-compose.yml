@@ -1,59 +1,152 @@
 version: "3"
 
 services:
-  namenode:
+  namenode1:
+    build: ./namenode
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    container_name: namenode
+    container_name: namenode1
     restart: always
     ports:
       - 9870:9870
-      - 9000:9000
+      - 9001:9001
+      - 8020:8020
     volumes:
-      - hadoop_namenode:/hadoop/dfs/name
+      - hadoop_namenode1:/hadoop/dfs/name
     environment:
-      CLUSTER_NAME: test
-      TZ: Asia/Shanghai
-    env_file:
-      - ./hadoop.env
-
-  datanode:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: datanode
-    restart: always
-    volumes:
-      - hadoop_datanode:/hadoop/dfs/data
-    environment:
-      SERVICE_PRECONDITION: "namenode:9870"
+      HDFS_NAMENODE_USER: root
+      HDFS_DATANODE_USER: root
+      HDFS_ZKFC_USER: root
+      HDFS_JOURNALNODE_USER: root
+      YARN_RESOURCEMANAGER_USER: root
+      YARN_NODEMANAGER_USER: root
       TZ: Asia/Shanghai
     env_file:
       - ./hadoop.env
   
-  resourcemanager:
-    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
-    container_name: resourcemanager
+  namenode2:
+    build: ./namenode_standy
+    image: bde2020/hadoop-namenode-standy:2.0.0-hadoop3.2.1-java8
+    container_name: namenode2
     restart: always
+    ports:
+      - 9871:9870
+      - 8021:8020
+    volumes:
+      - hadoop_namenode2:/hadoop/dfs/name
     environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
       TZ: Asia/Shanghai
     env_file:
       - ./hadoop.env
 
-  nodemanager1:
+  namenode3:
+    build: ./namenode_standy
+    image: bde2020/hadoop-namenode-standy:2.0.0-hadoop3.2.1-java8
+    container_name: namenode3
+    restart: always
+    ports:
+      - 9872:9870
+      - 8082:8020
+    volumes:
+      - hadoop_namenode3:/hadoop/dfs/name
+    environment:
+      CLUSTER_NAME: test
+      TZ: Asia/Shanghai
+      SLAVE: 1
+    env_file:
+      - ./hadoop.env    
+  
+  journalnode1:
+    build: ./journalnode
+    image: bde2020/hadoop-journalnode:2.0.0-hadoop3.2.1-java8
+    container_name: journalnode1
+    restart: always
+#    ports:
+#      - 8485:8485
+    volumes:
+      - hadoop_journalnode1:/hadoop/dfs/edits
+    environment:
+      TZ: Asia/Shanghai
+    env_file:
+      - ./hadoop.env 
+  
+  journalnode2:
+    build: ./journalnode
+    image: bde2020/hadoop-journalnode:2.0.0-hadoop3.2.1-java8
+    container_name: journalnode2
+    restart: always
+#    ports:
+#      - 8485:8485
+    volumes:
+      - hadoop_journalnode2:/hadoop/dfs/edits
+    environment:
+      TZ: Asia/Shanghai
+    env_file:
+      - ./hadoop.env 
+
+  journalnode3:
+    build: ./journalnode
+    image: bde2020/hadoop-journalnode:2.0.0-hadoop3.2.1-java8
+    container_name: journalnode3
+    restart: always
+#    ports:
+#      - 8485:8485
+    volumes:
+      - hadoop_journalnode3:/hadoop/dfs/edits
+    environment:
+      TZ: Asia/Shanghai
+    env_file:
+      - ./hadoop.env 
+ 
+  datanode1:
+    build: ./datanode
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode1
+    restart: always
+    volumes:
+      - hadoop_datanode1:/hadoop/dfs/data
+    environment:
+      TZ: Asia/Shanghai
+    env_file:
+      - ./hadoop.env
+
+  datanode2:
+    build: ./datanode
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode2
+    restart: always
+    volumes:
+      - hadoop_datanode2:/hadoop/dfs/data
+    environment:
+      TZ: Asia/Shanghai
+    env_file:
+      - ./hadoop.env 
+
+  resourcemanager:
+    build: ./resourcemanager
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+    container_name: resourcemanager
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    env_file:
+      - ./hadoop.env
+
+  nodemanager:
+    build: ./nodemanager
     image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     container_name: nodemanager
     restart: always
     environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
       TZ: Asia/Shanghai
     env_file:
       - ./hadoop.env
   
   historyserver:
+    build: ./historyserver
     image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
     container_name: historyserver
     restart: always
     environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
       TZ: Asia/Shanghai
     volumes:
       - hadoop_historyserver:/hadoop/yarn/timeline
@@ -61,6 +154,12 @@ services:
       - ./hadoop.env
   
 volumes:
-  hadoop_namenode:
-  hadoop_datanode:
+  hadoop_namenode1:
+  hadoop_namenode2:
+  hadoop_namenode3:
+  hadoop_journalnode1:
+  hadoop_journalnode2:
+  hadoop_journalnode3:    
+  hadoop_datanode1:
+  hadoop_datanode2:
   hadoop_historyserver:
